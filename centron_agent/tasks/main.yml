@@ -1,0 +1,96 @@
+---
+# tasks file for centron_agent
+# Install the repositories
+- name: install the dnf-plugin
+  ansible.builtin.dnf:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - dnf-plugins-core
+    
+- name: intall the fedore
+  command: dnf install -y http://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+
+- name: Enable CodeReady builder repo
+  command: subscription-manager repos --enable codeready-builder-for-rhel-9-x86_64-rpms
+
+
+- name: Reset PHP module
+  command: dnf module reset php -y
+  ignore_errors: yes
+
+- name: Install PHP 8.2 module
+  command: dnf module install php:8.2 -y
+
+- name: Download the MariaDB repo setup script
+  get_url:
+    url: https://r.mariadb.com/downloads/mariadb_repo_setup
+    dest: /tmp/mariadb_repo_setup
+    mode: '0755'
+
+- name: Run the MariaDB repo setup script
+  command: bash /tmp/mariadb_repo_setup --os-type=rhel --os-version=9 --mariadb-server-version="mariadb-10.11"
+
+- name: Add Centreon repository
+  command: dnf config-manager --add-repo https://packages.centreon.com/rpm-standard/24.10/el9/centreon-24.10.repo
+  args:
+    creates: /etc/yum.repos.d/centreon-24.10.repo
+
+- name: Clean all DNF cache
+  command: dnf clean all --enablerepo=*
+
+#- name: Update all packages
+#  dnf:
+#    name: '*'
+#    state: latest
+
+
+#Step 2: Installation
+
+- name: install the centron,mariadb packges
+  dnf:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - centreon-mariadb
+    - centreon
+
+
+- name: Reload systemd daemon
+  systemd:
+    daemon_reload: yes
+
+- name: Restart MariaDB service
+  systemd:
+    name: mariadb
+    state: restarted
+
+
+
+- name: Enable and start services
+  systemd:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  loop:
+    - php-fpm
+    - httpd
+    - centreon
+    - cbd
+    - centengine
+    - gorgoned
+    - snmptrapd
+    - centreontrapd
+    - snmpd
+    - crond
+
+- name: Enabled and restarted mariadb
+  systemd:
+    name: mariadb
+    enabled: yes
+    state: restarted
+
+- name: secure database
+  shell: mariadb-secure-installation
+
+

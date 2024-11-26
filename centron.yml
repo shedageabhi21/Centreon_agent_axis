@@ -1,0 +1,5 @@
+---
+- name: install the centron agent
+  hosts: all
+  roles:
+    - centron_agent
