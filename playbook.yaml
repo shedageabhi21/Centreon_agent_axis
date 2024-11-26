@@ -1,0 +1,8 @@
+---
+- name: Install the Centreon agent
+  hosts: all
+  become: yes
+  gather_facts: yes
+
+  roles:
+    - centreon_agent
