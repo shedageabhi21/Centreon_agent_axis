@@ -1,0 +1,43 @@
+---
+- name: Configure MySQL default authentication plugin
+  ansible.builtin.lineinfile:
+    path: /etc/my.cnf.d/mysql-server.cnf
+    line: "default-authentication-plugin=mysql_native_password"
+    create: yes
+  notify:
+    - reload_daemon
+    - restart_mysqld
+
+- name: Update MySQL service limit
+  ansible.builtin.replace:
+    path: /usr/lib/systemd/system/mysqld.service
+    regexp: 'LimitNOFILE\s*=\s*\d+'
+    replace: 'LimitNOFILE = 32000'
+  notify:
+    - reload_daemon
+    - restart_mysqld
+
+- name: Enable Centreon and related services
+  ansible.builtin.service:
+    name: "{{ item }}"
+    enabled: yes
+  loop:
+    - php-fpm
+    - httpd
+    - centreon
+    - cbd
+    - centengine
+    - gorgoned
+    - snmptrapd
+    - centreontrapd
+    - snmpd
+
+
+- name: Enable and start crond
+  ansible.builtin.service:
+    name: crond
+    state: started
+    enabled: yes
+  notify:
+    - restart_mysqld
+

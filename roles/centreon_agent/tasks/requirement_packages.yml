@@ -1,0 +1,37 @@
+---
+
+- name: Clean all DNF metadata and enable all repositories
+  ansible.builtin.command:
+    cmd: dnf clean all --enablerepo=*
+
+- name: Update all packages to the latest version
+  ansible.builtin.dnf:
+    name: "*"
+    state: latest
+
+- name: Install dnf-plugins-core
+  ansible.builtin.yum:
+    name: dnf-plugins-core
+    state: present
+
+- name: Reset PHP module
+  ansible.builtin.command:
+    cmd: dnf module reset php -y
+    creates: /var/lib/dnf/moduledb/yaml/installed
+
+- name: Install PHP 8.2 module from Remi
+  ansible.builtin.command:
+    cmd: dnf module install php:remi-8.2 -y
+    creates: /var/lib/dnf/moduledb/yaml/installed
+
+- name: Install MySQL server
+  ansible.builtin.yum:
+    name:
+      - mysql-server
+      - mysql
+    state: present
+
+- name: Install server Centreon 
+  ansible.builtin.shell:
+    cmd: dnf install -y centreon-mysql centreon --skip-broken
+  register: install_output  # Register the output to check for issues later

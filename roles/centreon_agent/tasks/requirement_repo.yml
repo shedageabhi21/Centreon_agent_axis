@@ -1,0 +1,37 @@
+- name: Ensure SELinux is disabled
+  ansible.builtin.replace:
+    path: /etc/selinux/config
+    regexp: '^SELINUX=.*'
+    replace: 'SELINUX=disabled'
+
+- name: Stop and disable firewalld
+  ansible.builtin.service:
+    name: firewalld
+    state: stopped
+    enabled: no
+
+- name: Import the GPG key for EPEL
+  ansible.builtin.rpm_key:
+    state: present
+    key: https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-8
+
+- name: Install EPEL release
+  ansible.builtin.yum:
+    name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+    state: present
+
+- name: Enable CodeReady Builder repository
+  ansible.builtin.command:
+    cmd: subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
+    creates: /etc/yum.repos.d/redhat.repo
+
+- name: Add Centreon repository
+  ansible.builtin.command:
+    cmd: dnf config-manager --add-repo https://packages.centreon.com/rpm-standard/24.10/el8/centreon-24.10.repo
+
+
+- name: Install Remi release
+  ansible.builtin.command:
+    cmd: dnf install -y https://rpms.remirepo.net/enterprise/remi-release-8.rpm
+
+

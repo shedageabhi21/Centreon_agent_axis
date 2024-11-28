@@ -1,2 +1,10 @@
 ---
 # handlers file for roles/centreon_agent
+- name: reload_daemon
+  command: systemctl daemon-reload
+
+- name: restart_mysqld
+  service:
+    name: mysqld
+    enabled: yes
+    state: restarted
