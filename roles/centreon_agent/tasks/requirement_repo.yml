@@ -27,7 +27,7 @@
 
 - name: Add Centreon repository
   ansible.builtin.command:
-    cmd: dnf config-manager --add-repo https://packages.centreon.com/rpm-standard/24.10/el8/centreon-24.10.repo
+    cmd: dnf config-manager --add-repo https://packages.centreon.com/rpm-standard/24.04/el8/centreon-24.04.repo
 
 
 - name: Install Remi release

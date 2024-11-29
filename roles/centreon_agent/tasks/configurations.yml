@@ -15,6 +15,24 @@
 - name: daemon reload
   command: systemctl daemon-reload 
 
+- name: start and enabled the mysqld
+  service:
+    name: mysqld
+    enabled: true
+    state: restarted
+
+- name: set the php time zone
+  lineinfile:
+    line: 'date.timezone = Europe/Paris'
+    regexp: '^date.timezone'
+    path: /etc/php.d/50-centreon.ini
+    create: yes
+
+- name: restart the php-fpm service
+  service:
+    name: php-fpm
+    state: restarted
+
 - name: Enable Centreon and related services
   ansible.builtin.service:
     name: "{{ item }}"
@@ -41,19 +59,19 @@
   service:
     name: mysqld
     enabled: true
-    state: started
+    state: restarted
 
-- name: Add $hostCentreon configuration to /etc/centreon/conf.pm
-  lineinfile:
-    path: /etc/centreon/conf.pm
-    line: '$hostCentreon = "{{ ansible_default_ipv4.address }}"'
-    create: yes  # This will create the file if it does not exist
-    regexp: '^$hostCentreon'
-    state: present  # Ensures the line is added if not present
-    backup: yes  # Optionally backup the file before making changes
+#- name: Add $hostCentreon configuration to /etc/centreon/conf.pm
+#  lineinfile:
+#    path: /etc/centreon/conf.pm
+#    line: '$hostCentreon = "{{ ansible_default_ipv4.address }}"'
+#    create: yes  # This will create the file if it does not exist
+#    regexp: '^$hostCentreon'
+#    state: present  # Ensures the line is added if not present
+#    backup: yes  # Optionally backup the file before making changes
 
-- name: Clear Centreon cache
-  command: rm -rf /var/cache/centreon/*
+#- name: Clear Centreon cache
+#  command: rm -rf /var/cache/centreon/*
 
 
 
