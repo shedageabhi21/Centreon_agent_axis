@@ -4,18 +4,16 @@
     path: /etc/my.cnf.d/mysql-server.cnf
     line: "default-authentication-plugin=mysql_native_password"
     create: yes
-  notify:
-    - reload_daemon
-    - restart_mysqld
+
 
 - name: Update MySQL service limit
   ansible.builtin.replace:
     path: /usr/lib/systemd/system/mysqld.service
     regexp: 'LimitNOFILE\s*=\s*\d+'
     replace: 'LimitNOFILE = 32000'
-  notify:
-    - reload_daemon
-    - restart_mysqld
+
+- name: daemon reload
+  command: systemctl daemon-reload 
 
 - name: Enable Centreon and related services
   ansible.builtin.service:
@@ -38,6 +36,26 @@
     name: crond
     state: started
     enabled: yes
-  notify:
-    - restart_mysqld
+
+- name: start and enabled the mysqld
+  service:
+    name: mysqld
+    enabled: true
+    state: started
+
+- name: Add $hostCentreon configuration to /etc/centreon/conf.pm
+  lineinfile:
+    path: /etc/centreon/conf.pm
+    line: '$hostCentreon = "{{ ansible_default_ipv4.address }}"'
+    create: yes  # This will create the file if it does not exist
+    regexp: '^$hostCentreon'
+    state: present  # Ensures the line is added if not present
+    backup: yes  # Optionally backup the file before making changes
+
+- name: Clear Centreon cache
+  command: rm -rf /var/cache/centreon/*
+
+
+
+
 

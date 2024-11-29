@@ -4,10 +4,10 @@
   ansible.builtin.command:
     cmd: dnf clean all --enablerepo=*
 
-- name: Update all packages to the latest version
-  ansible.builtin.dnf:
-    name: "*"
-    state: latest
+#- name: Update all packages to the latest version
+##  ansible.builtin.dnf:
+#    name: "*"
+#    state: latest
 
 - name: Install dnf-plugins-core
   ansible.builtin.yum:
@@ -24,14 +24,18 @@
     cmd: dnf module install php:remi-8.2 -y
     creates: /var/lib/dnf/moduledb/yaml/installed
 
-- name: Install MySQL server
+- name: Install MySQL, Centreon server
   ansible.builtin.yum:
     name:
       - mysql-server
       - mysql
+      - python3
+      - python3-pip
+      - centreon-mysql
+      - centreon
     state: present
 
-- name: Install server Centreon 
+- name: Install pymysql
   ansible.builtin.shell:
-    cmd: dnf install -y centreon-mysql centreon --skip-broken
+    cmd: pip3 install pymysql 
   register: install_output  # Register the output to check for issues later
