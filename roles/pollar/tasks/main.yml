@@ -1,0 +1,79 @@
+---
+- name: Ensure SELinux is disabled
+  ansible.builtin.replace:
+    path: /etc/selinux/config
+    regexp: '^SELINUX=.*'
+    replace: 'SELINUX=disabled'
+
+- name: Stop and disable firewalld
+  ansible.builtin.service:
+    name: firewalld
+    state: stopped
+    enabled: no
+
+- name: Install dnf-plugins-core
+  ansible.builtin.yum:
+    name: dnf-plugins-core
+    state: present
+
+- name: Import the GPG key for EPEL
+  ansible.builtin.rpm_key:
+    state: present
+    key: https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-8
+
+- name: Install EPEL release
+  ansible.builtin.yum:
+    name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+    state: present
+
+- name: Enable CodeReady Builder repository
+  ansible.builtin.command:
+    cmd: subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
+    creates: /etc/yum.repos.d/redhat.repo
+
+- name: Add Centreon repository
+  ansible.builtin.command:
+    cmd: dnf config-manager --add-repo https://packages.centreon.com/rpm-standard/24.04/el8/centreon-24.04.repo
+
+- name: Clean all dnf caches
+  ansible.builtin.command:
+    cmd: dnf clean all --enablerepo=*
+
+- name: Update all packages
+  ansible.builtin.dnf:
+    name: "*"
+    state: latest
+
+
+- name: Install centreon-poller
+  ansible.builtin.yum:
+    name: centreon-poller
+    state: present
+
+- name: Enable Centreon and related services
+  ansible.builtin.service:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  loop:
+    - centreon
+    - centengine
+    - centreontrapd
+    - snmptrapd
+    - gorgoned
+
+- name: Restart service centengine
+  ansible.builtin.service:
+    name: centengine
+    state: restarted
+ 
+- name: Copy the script to the target machine
+  ansible.builtin.copy:
+    src: registerServerTopology.sh
+    dest: /tmp/registerServerTopology.sh
+    mode: '0755'
+
+- name: Execute the script with multiple arguments
+  ansible.builtin.shell:
+    cmd: "sh /tmp/registerServerTopology.sh -u {{ API_ACCOUNT }}  -t poller -h {{ IP_TARGET_NODE }} -n {{ POLLER_NAME }}-{{ ansible_default_ipv4.address }} -p {{ API_TARGET_NODE_PASSWD }} -c y"
+
