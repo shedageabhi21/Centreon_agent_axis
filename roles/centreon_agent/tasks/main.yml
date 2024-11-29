@@ -7,3 +7,6 @@
 
 - name: Import configuration 
   import_tasks: configurations.yml
+
+- name: mysql_secure_installation
+  import_tasks: mysql_secure_installation.yml

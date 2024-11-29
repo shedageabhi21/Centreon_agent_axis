@@ -1,0 +1,40 @@
+--- 
+- name: Set MySQL root password
+  mysql_user:
+    name: root
+    password: "Redhat@12345"
+    host: localhost
+    login_user: root
+    login_password: "Redhat@12345"
+    state: present
+    
+- name: Remove anonymous MySQL users
+  mysql_user:
+    name: ""
+    state: absent
+    login_user: root
+    login_password: "Redhat@12345"
+    
+- name: Remove test database
+  mysql_db:
+    name: "{{ item }}"
+    state: absent
+    login_user: root
+    login_password: "Redhat@12345"
+  loop:
+    - test
+
+#- name: Drop centreon DB
+#  mysql_query:
+#    login_user: root
+#    login_password: "Redhat@12345"
+#    query: "{{ item }}"
+#  loop:
+#    - "DROP DATABASE centreon;"
+#    - "DROP DATABASE centreon_storage;"
+
+- name: Reload privilege tables
+  mysql_query:
+    login_user: root
+    login_password: "Redhat@12345"
+    query: "FLUSH PRIVILEGES;"
