@@ -1,0 +1,7 @@
+---
+- name: Just checking purpose
+  hosts: all
+  tasks:
+    - name: Print success
+      ansible.builtin.debug:
+        msg: "success"
