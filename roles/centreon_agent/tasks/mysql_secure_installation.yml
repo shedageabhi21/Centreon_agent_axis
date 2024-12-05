@@ -34,7 +34,8 @@
 #    - "DROP DATABASE centreon_storage;"
 
 - name: Reload privilege tables
-  mysql_query:
+  community.mysql.mysql_query:
+    query: "FLUSH PRIVILEGES;"
     login_user: root
     login_password: "Redhat@12345"
-    query: "FLUSH PRIVILEGES;"
+
