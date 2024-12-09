@@ -4,5 +4,8 @@
   become: yes
   gather_facts: yes
 
+  collections:
+    - community.mysql
+
   roles:
     - centreon_agent
