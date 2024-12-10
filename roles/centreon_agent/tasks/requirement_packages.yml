@@ -17,23 +17,28 @@
   ansible.builtin.command:
     cmd: dnf clean all --enablerepo=*
 
+- name: Clean yum repository
+  ansible.builtin.command: yum clean all    
+
 - name: Update all packages to the latest version
   ansible.builtin.dnf:
     name: "*"
     state: latest
 
+- name: Clean yum repository
+  ansible.builtin.command: yum clean all
+  
 - name: Install MySQL, Centreon server
-  ansible.builtin.yum:
-    name:
+  ansible.builtin.dnf:
+    name: "{{ item }}"
+    state: present    
+    loop:
       - mysql-server
       - mysql
       - python3
       - python3-pip
       - centreon-mysql
       - centreon
-    state: present
-
+    
 - name: Install pymysql
-  ansible.builtin.shell:
-    cmd: pip3 install pymysql 
-  register: install_output
+  ansible.builtin.command: pip3 install pymysql 
