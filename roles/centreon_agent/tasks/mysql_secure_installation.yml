@@ -2,10 +2,10 @@
 - name: Set MySQL root password
   mysql_user:
     name: root
-    password: "Redhat@12345"
+    password: "{{ mysql_root_password }}"
     host: localhost
     login_user: root
-    login_password: "Redhat@12345"
+    login_password: "{{ default_mysql_root_password }}"
     state: present
     
 - name: Remove anonymous MySQL users
@@ -13,14 +13,14 @@
     name: ""
     state: absent
     login_user: root
-    login_password: "Redhat@12345"
+    login_password: "{{ mysql_root_password }}"
     
 - name: Remove test database
   mysql_db:
     name: "{{ item }}"
     state: absent
     login_user: root
-    login_password: "Redhat@12345"
+    login_password: "{{ mysql_root_password }}"
   loop:
     - test
 
@@ -40,5 +40,5 @@
 #    login_password: "Redhat@12345"
 
 - name: Reload privilege tables
-  shell: mysql -u root -p'Redhat@12345' -e "FLUSH PRIVILEGES;"
+  shell: mysql -u root -p"{{ mysql_root_password }}" -e "FLUSH PRIVILEGES;"
 
