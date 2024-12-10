@@ -1,7 +1,7 @@
 ---
 # vars file for pollar
 API_ACCOUNT: "admin"
-IP_TARGET_NODE: "192.168.95.61"
+IP_TARGET_NODE: ""
 POLLER_NAME: "poller-"
 API_TARGET_NODE_PASSWD: "Redhat@12345"
 
