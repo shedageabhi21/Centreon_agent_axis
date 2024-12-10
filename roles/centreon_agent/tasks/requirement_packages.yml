@@ -35,10 +35,10 @@
     loop:
       - mysql-server
       - mysql
-      - python3
-      - python3-pip
       - centreon-mysql
       - centreon
+      - python3
+      - python3-pip      
     
 - name: Install pymysql
   ansible.builtin.command: pip3 install pymysql 
