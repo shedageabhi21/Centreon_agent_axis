@@ -75,5 +75,5 @@
 
 - name: Execute the script with multiple arguments
   ansible.builtin.shell:
-    cmd: "sh /tmp/registerServerTopology.sh -u {{ API_ACCOUNT }}  -t poller -h {{ IP_TARGET_NODE }} -n {{ POLLER_NAME }}-{{ ansible_default_ipv4.address }} -p {{ API_TARGET_NODE_PASSWD }} -c y"
+    cmd: "sh /tmp/registerServerTopology.sh -u {{ API_ACCOUNT }}  -t poller -h {{ IP_TARGET_NODE }} -n {{ POLLER_NAME }}-{{ ansible_default_ipv4.address }} -p {{ API_TARGET_NODE_PASSWD }} --node-address {{ ansible_default_ipv4.address }} -c y"
 
