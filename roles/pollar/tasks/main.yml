@@ -37,7 +37,7 @@
 
 - name: Clean all dnf caches
   ansible.builtin.command:
-    cmd: dnf clean all --enablerepo=*
+    cmd: dnf clean all 
 
 - name: Update all packages
   ansible.builtin.dnf:
